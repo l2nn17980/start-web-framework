@@ -1,0 +1,47 @@
+edition: 3.0.0
+name: start-laravel-app
+access: '{{ access }}'
+vars:
+  region: '{{ region }}'
+  functionName: '{{ functionName }}'
+resources:
+  start_laravel:
+    component: fc3
+    props:
+      region: ${vars.region}
+      description: Serverless Devs Web Framework Function
+      runtime: custom
+      timeout: 60
+      memorySize: 256
+      customRuntimeConfig:
+        command:
+          - bash
+        args:
+          - '-c'
+          - /code/start.sh
+      functionName: ${vars.functionName}
+      code: ./code
+      environmentVariables:
+        APP_KEY: base64:1484xsuUgwXy8fjnW82sDJH9KKBoDYSb88LUlass3Og=
+      triggers:
+        - triggerName: httpTrigger
+          triggerType: http
+          triggerConfig:
+            authType: anonymous
+            methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - HEAD
+              - OPTIONS
+  fc3_domain_0:
+    component: fc3-domain
+    props:
+      region: ${vars.region}
+      domainName: auto
+      protocol: HTTP
+      routeConfig:
+        routes:
+          - path: /*
+            functionName: ${vars.functionName}
